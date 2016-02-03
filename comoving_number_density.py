@@ -6,6 +6,8 @@ import astropy.units as u
 pi=3.141592653589793
 
 def comoving_distance(z,h=0.6774,OmM=0.3089,OmL=0.6911,Omk=0.0,dz=0.001,inverse_h=None):
+    #Defaults to Planck 2015 cosmology
+
     H0 = 100. * h #km / s / Mpc
     D_hubble = 3000. / h # h^{-1} Mpc = 9.26e25 / h; (meters)
     cosmo = FlatLambdaCDM(H0 = H0 * u.km / u.s / u.Mpc, Om0 = OmM)
