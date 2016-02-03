@@ -60,4 +60,4 @@ def stack_radec(image, hd, radec_positions, side=100, error=None):
 
 	wthumb = np.sum(thumbs_errors[0]/thumbs_errors[1],axis=0) / np.sum(1.0/thumbs_errors[1],axis=0) 
 
-	return wthumb
+	return [wthumb, thumbs_errors]
