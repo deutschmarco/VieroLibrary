@@ -45,44 +45,6 @@ def sed(p, nu_in, T, betain, alphain): #; m = [A, T, Beta, Alpha] - return SED (
 
 	return graybody
 
-def sed_old(p, nu_in): #; m = [A, T, Beta, Alpha] - return SED (array) in Jy
-	#P[0] = A
-	#P[1] = T
-	#P[2] = Beta
-	#P[3] = Alpha
-
-	v = p.valuesdict()
-	A = v['Ain']
-	T = v['Tin']
-	betain = v['betain']
-	alphain = v['alphain']
-
-	ns = len(nu_in)
-	base = 2.0 * (6.626)**(-2.0 - betain - alphain) * (1.38)**(3. + betain + alphain) / (2.99792458)**2.0
-	expo = 34.0 * (2.0 + betain + alphain) - 23.0 * (3.0 + betain + alphain) - 16.0 + 26.0
-	K = base * 10.0**expo
-	w = A * K * (T * (3.0 + betain + alphain))**(3.0 + betain + alphain) / (np.exp(3.0 + betain + alphain) - 1.0)
-	nu_cut = (3.0 + betain + alphain) * 0.208367e11 * T
-	
-	graybody = np.zeros(ns)
-
-	if (len(nu_in) > 1):
-		nu_gt_cut = np.where(nu_in > nu_cut)
-		n_zero1 = len(nu_gt_cut)
-		nu_le_cut = np.where(nu_in <= nu_cut)
-		n_zero2 = len(nu_le_cut)
-
-		if (n_zero1 > 0): graybody[nu_gt_cut] = w * nu_in[nu_gt_cut]**(-1.0 * betain)
-		if (n_zero2 > 0): graybody[nu_le_cut] = A * nu_in[nu_le_cut]**betain * black(nu_in[nu_le_cut], T) / 1000.0
-
-	else:
-		for i in range(len(nu_in)): 
-			if (nu_in[i] > nu_cut):
-				graybody[i] = w * nu_in[i]**(-1.0 * betain) 
-			else: 
-				graybody[i] = A * nu_in[i]**betain * black(nu[i], T)/1000.
-	return graybody
-
 def sedint(p, nu_in, Lir, T, betain, alphain): # m = [A, T, Beta, Alpha] - return integrated SED flux (one number) in Jy x Hz
 #def sedint(p, nu_in, Lir, ng, T, betain, alphain): # m = [A, T, Beta, Alpha] - return integrated SED flux (one number) in Jy x Hz
 	#P[0] = A
@@ -160,64 +122,6 @@ def sedint2(p, nu_in, Lir, ng): # m = [A, T, Beta, Alpha] - return integrated SE
 	dnu = np.append(dnu[0],dnu)
 
 	return np.ravel([np.sum(graybody * dnu, axis=1) - Lir]) 
-
-def sedint_old(p, nu_in, Lir): # m = [A, T, Beta, Alpha] - return integrated SED flux (one number) in Jy x Hz
-	#P[0] = A
-	#P[1] = T
-	#P[2] = Beta
-	#P[3] = Alpha
-
-	v = p.valuesdict()
-	A = v['Ain']
-	T = v['Tin']
-	betain = v['betain']
-	alphain = v['alphain']
-
-
-	ns = len(nu_in)
-	ng = len(A)
-	base = 2.0 * (6.626)**(-2.0 - betain - alphain) * (1.38)**(3. + betain + alphain) / (2.99792458)**2.0
-	expo = 34.0 * (2.0 + betain + alphain) - 23.0 * (3.0 + betain + alphain) - 16.0 + 26.0
-	K = base * 10.0**expo
-	w_num = A * K * (T * (3.0 + betain + alphain))**(3.0 + betain + alphain) 
-	w_den = (np.exp(3.0 + betain + alphain) - 1.0)
-	w_div = w_num/w_den #A * K * (T * (3.0 + betain + alphain))**(3.0 + betain + alphain) / (np.exp(3.0 + betain + alphain) - 1.0)
-	nu_cut = (3.0 + betain + alphain) * 0.208367e11 * T
-	
-	#Original Function
-	graybody = np.zeros(ns)
-	nu_gt_cut = np.where(nu_in > nu_cut)
-	nu_le_cut = np.where(nu_in <= nu_cut)
-	n_zero1 = len(nu_gt_cut)
-	n_zero2 = len(nu_le_cut)
-	if (n_zero1 > 0): graybody[nu_gt_cut] = w_div * nu_in[nu_gt_cut]**(-1.0 * betain)
-	if (n_zero2 > 0): graybody[nu_le_cut] = A * nu_in[nu_le_cut]**betain * black(nu_in[nu_le_cut], T) / 1000.0
-
-	#graybody = np.ravel(np.zeros([ng,ns]))
-
-	#nu_gt_cut = (np.where(nu_in > np.reshape(nu_cut, (ng,1)) ) ) [1]
-	#nu_gt_cut = np.reshape(nu_gt_cut,(ng,ns))
-	##nu_gt_cut = np.where(np.tile(nu_in, (ng,1)) > np.reshape(nu_cut, (ng,1)) )
-	#n_zero1 = len(nu_gt_cut)
-	#nu_le_cut = (np.where(nu_in <= np.reshape(nu_cut, (ng,1)) ) )[1] 
-	#nu_le_cut = np.reshape(nu_le_cut,(ng,ns))
-	##nu_le_cut = np.where(np.tile(nu_in, (ng,1)) <= np.reshape(nu_cut, (ng,1)) )
-	#n_zero2 = len(nu_le_cut)
-	#pdb.set_trace()
-
-	##if (n_zero1 > 0): graybody[nu_gt_cut] = np.reshape(w_div, (ng,1)) * np.tile(nu_in, (ng,1))[nu_gt_cut]**(-1.0 * np.reshape(betain,(ng,1)) )
-	##if (n_zero2 > 0): graybody[nu_le_cut] = np.reshape(A,(ng,1))      * np.tile(nu_in, (ng,1))[nu_le_cut]**np.reshape(betain,(ng,1)) * black(np.tile(nu_in, (ng,1))[nu_le_cut], T) / 1000.0
-
-	#blackbody = black(nu_in,np.reshape(T,(ng,1)))
-	#if (n_zero1 > 0): 
-	#	graybody[nu_gt_cut] = np.reshape(w_div, (ng,1)) * np.tile(nu_in, ng)[nu_gt_cut]**(-1.0 * np.reshape(betain,(ng,1)) )
-	#if (n_zero2 > 0): 
-	#	graybody[nu_le_cut] = np.reshape(A,(ng,1))      * np.tile(nu_in, ng)[nu_le_cut]**np.reshape(betain,(ng,1)) * black(np.tile(nu_in, (ng,1))[nu_le_cut], T) / 1000.0
-
-	dnu = nu_in[1:ns] - nu_in[0:ns-1]
-	dnu = np.append(dnu[0],dnu)
-
-	return np.ravel([np.sum(graybody * dnu) - Lir]) 
 
 def simple_flux_from_greybody(lambdavector, Trf = None, b = None, Lrf = None, zin = None, ngal = None):
 	''' 
@@ -321,16 +225,10 @@ def single_simple_flux_from_greybody(lambdavector, Trf = None, b = 2.0, Lrf = No
 
 	fit_params = Parameters()
 	fit_params.add('Ain', value= Ain)
-	#fit_params.add('Tin', value= Trf/(1.+zin), vary = False)
-	#fit_params.add('betain', value= b, vary = False)
-	#fit_params.add('alphain', value= alphain, vary = False)
 
-	#pdb.set_trace()
 	#THE LM FIT IS HERE
-	#Pfin = minimize(sedint, fit_params, args=(nu_mod,Lir.value,ngal))
 	Pfin = minimize(sedint, fit_params, args=(nu_mod,Lir.value,Trf/(1.+zin),b,alphain))
 
-	#pdb.set_trace()
 	flux_mJy=sed(Pfin.params,nuvector,Trf/(1.+zin),b,alphain)
 
 	return flux_mJy

@@ -39,3 +39,12 @@ def comoving_number_density(number, area, z1, z2, ff=1.0, mpc=None, verbose=None
     comovnumden=num/vol
 
     return comovnumden
+
+def comoving_volume_given_area(area, zz1, zz2, mpc=None, arcmin=None):
+    if arcmin != None: 
+        ff = 3600. 
+    else:
+        ff=1. 
+    vol0=comoving_volume(zz1,zz2,mpc=mpc)
+    vol=((area*ff)/(180./pi)**2.)/(4.*pi)*vol0
+    return vol
