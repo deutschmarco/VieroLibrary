@@ -9,8 +9,10 @@ from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
 from lmfit import Parameters, minimize, fit_report
 
-zin = np.array([1.0])
-Lin = np.array([1e12])#,2e12,1e13])
+#Trf = 20K, b = 2.0, Lrf = 10^13, zin = 0.1, ngal = 1
+
+zin = np.array([0.1])
+Lin = np.array([1e13])#,2e12,1e13])
 lambdavector = np.array([250,350,500])
 nwv = len(lambdavector)
 
@@ -27,7 +29,7 @@ int_sed = Lin / conversion # Jy x Hz
 
 
 Ain = np.array([1.e-36])#,3.e-36,1.2e-36]) #good starting parameter
-Tin = np.array([23.0])#,24.0,28.0])
+Tin = np.array([20.0])#,24.0,28.0])
 betain = np.array([2.0])#,2.0,2.0])
 alphain =np.array([2.0])#,2.0,2.0])
 #Ain = np.array([1.e-36]) #good starting parameter
