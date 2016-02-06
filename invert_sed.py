@@ -156,6 +156,7 @@ def simple_flux_from_greybody(lambdavector, Trf = None, b = None, Lrf = None, zi
 	lambda_mod = loggen(1e3, 8.0, nsed) # microns
 	nu_mod = c * 1.e6/lambda_mod # Hz
 
+	#Lorenzo's version had: H0=70.5, Omega_M=0.274, Omega_L=0.726 (Hinshaw et al. 2009)
 	cosmo = FlatLambdaCDM(H0 = 70.5 * u.km / u.s / u.Mpc, Om0 = 0.273)
 	conversion = 4.0 * np.pi *(1.0E-13 * cosmo.luminosity_distance(zin) * 3.08568025E22)**2.0 / L_sun # 4 * pi * D_L^2    units are L_sun/(Jy x Hz)
 

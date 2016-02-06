@@ -39,7 +39,7 @@ def cut_thumbnail(image, xpos, ypos, side_pix, error=None):
 
 	return [cube,cuberr]
 
-def stack_radec(image, hd, radec_positions, side=100, error=None):
+def stack_radec(image, hd, radec_positions, side=100, error=None, verb=None, zlist=None, zlo=0., zhi=1000.):
 	#if error == None: 
 	#	error2 = None
 	#else: error2 = error
@@ -51,13 +51,18 @@ def stack_radec(image, hd, radec_positions, side=100, error=None):
 	mapsize = np.shape(image)
 
 	ty,tx = w.wcs_world2pix(radec_positions[0], radec_positions[1], 0) 
-	ind_keep = np.where((tx >= 0) & (np.floor(tx) < mapsize[0]) & (ty >= 0) & (np.floor(ty) < mapsize[1]))
+	if zlist != None:
+		ind_keep = np.where((tx >= 0) & (np.floor(tx) < mapsize[0]) & (ty >= 0) & (np.floor(ty) < mapsize[1]) & (zlist >= zlo) & (zlist < zhi))
+	else:
+		ind_keep = np.where((tx >= 0) & (np.floor(tx) < mapsize[0]) & (ty >= 0) & (np.floor(ty) < mapsize[1]))
 	nt0 = np.shape(ind_keep)[1]
 	real_x=np.floor(tx[ind_keep]).astype(int)
 	real_y=np.floor(ty[ind_keep]).astype(int)
 
+	if verb != None:
+		print str(len(real_x)) + ' galaxies in region'
 	thumbs_errors = cut_thumbnail(image,real_x,real_y,side,error=error) 
 
 	wthumb = np.sum(thumbs_errors[0]/thumbs_errors[1],axis=0) / np.sum(1.0/thumbs_errors[1],axis=0) 
 
-	return [wthumb, thumbs_errors]
+	return [wthumb, thumbs_errors,ind_keep]
